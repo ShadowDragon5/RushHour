@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<project name="RushHour" default="run" basedir=".">
+	<!-- Java sources -->
+	<property name="src.dir" location="src" />
+
+	<!-- Java classes -->
+	<property name="build.dir" location="build" />
+
+	<path id="build.classpath">
+		<pathelement location="${build.dir}" />
+	</path>
+
+
+	<target name="init">
+		<!-- Create the time stamp -->
+		<tstamp />
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${build.dir}" />
+	</target>
+
+	<target name="compile" depends="init" description="compile the source ">
+		<!-- Compile the java code from ${src.dir} into ${build.dir} -->
+		<javac includeantruntime="false" srcdir="${src.dir}"
+			destdir="${build.dir}" />
+	</target>
+
+	<target name="clean" description="clean up">
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />
+	</target>
+
+	<target name="run" depends="clean, compile" >
+		<java classname="at.fhooe.ai.rushhour.RushHour" >
+			<classpath refid="build.classpath" />
+			<arg line="data/jams.txt" />
+		</java>
+	</target>
+
+</project>
