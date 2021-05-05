@@ -1,6 +1,7 @@
 package at.fhooe.ai.rushhour;
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
+import java.lang.Math;
 
 /**
  * This is the template for a class that performs A* search on a given rush hour
@@ -17,8 +18,10 @@ public class AStar {
     /** The solution path is stored here */
     public State[] path;
 
-    private PriorityQueue< SimpleEntry<Node, Integer> > open;
-    private HashMap<Node, Integer> closed;
+    //private HashMap<NodewH, Integer> open;
+    //private PriorityQueue<NodewH> open;
+    private ArrayList<nNode> open;
+    private HashSet<nNode> closed;
 
     /**
      * This is the constructor that performs A* search to compute a
@@ -26,52 +29,82 @@ public class AStar {
      */
     public AStar(Puzzle puzzle, Heuristic heuristic) {
 
-        ArrayList<State> new_path = new ArrayList<State>();
+        open = new ArrayList();
 
-        open = new PriorityQueue(1, new Comparator<SimpleEntry>() {
-            public int compare(SimpleEntry e1, SimpleEntry e2) {
-                return Integer.compare((int)e1.getValue(), (int)e2.getValue());
-            }
-        });
-
-        closed = new HashMap<Node, Integer>();
+        closed = new HashSet<nNode>();
 
         Node inode = puzzle.getInitNode();
-        open.add(new SimpleEntry<Node, Integer>(inode,
-                    inode.getDepth() + heuristic.getValue(inode.getState())));
+        open.add(new nNode(inode, heuristic.getValue(inode.getState())));
 
-        int a = 0;
         while (!open.isEmpty()) {
 
-            SimpleEntry<Node, Integer> current = open.poll();
+            Collections.sort(open);
+            nNode current = open.remove(0);
 
-            if (closed.containsKey(current))
+            if (closed.contains(current))
                 continue;
 
-            closed.put(current.getKey(), current.getValue());
+            closed.add(current);
 
-            if (current.getKey().getState().isGoal()) {
+            if (current.getState().isGoal()) {
+
+                path = new State[current.getDepth() + 1];
 
                 // reconstruct path
-                Node node = current.getKey();
-                while (!node.getState().equals(inode.getState())) {
-                    new_path.add(node.getState());
+                Node node = current;
+                while (node != null) {
+                    path[node.getDepth()] = node.getState();
                     node = node.getParent();
                 }
-                path = new State[new_path.size()];
-                path = new_path.toArray(path);
-
                 break;
             }
 
-            for (Node n : current.getKey().expand()) {
-                if (closed.containsKey(n))
+            for (Node no : current.expand()) {
+                int score = no.getDepth() + heuristic.getValue(no.getState());
+                nNode n = new nNode(no, score);
+
+                if (closed.contains(n))
                     continue;
 
-                int score = n.getDepth() + heuristic.getValue(n.getState());
-                open.add(new SimpleEntry<Node, Integer>(n, score));
+                int i = open.indexOf(n);
+                if (i != -1 && open.get(i).compareTo(n) > 1) {
+                    open.remove(i);
+                    open.add(n);
+                }
+                else
+                    open.add(n);
             }
         }
+    }
+
+    // new Node class
+    private class nNode extends Node implements Comparable<nNode> {
+
+        private int d;
+
+        public nNode(Node n, int d) {
+            super(n.getState(), n.getDepth(), n.getParent());
+            this.d = d;
+        }
+
+        @Override
+        public int hashCode() {
+            return this.getState().hashCode();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null)
+                return false;
+
+            return this.hashCode() == ((nNode)o).hashCode();
+        }
+
+        @Override
+        public int compareTo(nNode n) {
+            return Integer.compare(this.d, n.d);
+        }
+
     }
 
 }
