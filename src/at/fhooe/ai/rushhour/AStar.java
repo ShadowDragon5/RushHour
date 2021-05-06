@@ -18,8 +18,6 @@ public class AStar {
     /** The solution path is stored here */
     public State[] path;
 
-    //private HashMap<NodewH, Integer> open;
-    //private PriorityQueue<NodewH> open;
     private ArrayList<nNode> open;
     private HashSet<nNode> closed;
 
@@ -30,7 +28,6 @@ public class AStar {
     public AStar(Puzzle puzzle, Heuristic heuristic) {
 
         open = new ArrayList();
-
         closed = new HashSet<nNode>();
 
         Node inode = puzzle.getInitNode();
@@ -97,7 +94,7 @@ public class AStar {
             if (o == null)
                 return false;
 
-            return this.hashCode() == ((nNode)o).hashCode();
+            return this.getState().equals(((nNode)o).getState());
         }
 
         @Override

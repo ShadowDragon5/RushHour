@@ -25,7 +25,7 @@ public class RushHour {
     Puzzle[] puzzles = Puzzle.readPuzzlesFromFile(argv[0]);
 
     String[] heuristic_names = null;
-    int num_puzzles = 1;//puzzles.length;
+    int num_puzzles = puzzles.length;
     int num_heuristics = 0;
 
     int[][] num_expanded = null;
@@ -38,8 +38,8 @@ public class RushHour {
 
       Heuristic[] heuristics = { // these are the heuristics to be used
           new ZeroHeuristic(puzzles[i]),
-          //new BlockingHeuristic(puzzles[i]),
-          //new AdvancedHeuristic(puzzles[i]),
+          new BlockingHeuristic(puzzles[i]),
+          new AdvancedHeuristic(puzzles[i]),
           };
 
       if (i == 0) {
